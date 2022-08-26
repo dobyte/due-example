@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+message CreateRoomCode {
+    enum Code {
+        Ok = 0; // 创建成功
+        Failed = 1; // 创建失败
+        NameExists = 2; // 名字已存在
+    }
+}
+
+message JoinRoomCode {
+    enum Code {
+        Ok = 0; // 创建成功
+        Failed = 1; // 创建失败
+        RoomNotExists = 2; // 房间不存在
+    }
+}
+
+// 创建房间请求
+message CreateRoomReq {
+    string Name = 1; // 房间名称
+}
+
+// 创建房间响应
+message CreateRoomRes {
+    CreateRoomCode.Code Code = 1; // 返回码
+    int32 ID = 2; // 房间ID
+}
+
+// 加入房间请求
+message JoinRoomReq {
+    int32 ID = 1; // 房间ID
+}
+
+// 加入房间响应
+message JoinRoomRes {
+    JoinRoomCode.Code Code = 1; // 返回码
+}
