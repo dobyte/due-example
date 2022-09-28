@@ -24,9 +24,9 @@ func (c *Core) Init() {
 	// 监听连接断开
 	c.proxy.AddEventListener(cluster.Disconnect, c.disconnect)
 	// 创建房间
-	c.proxy.AddRoute(route.CreateRoom, false, c.createRoom)
+	c.proxy.AddRouteHandler(route.CreateRoom, false, c.createRoom)
 	// 加入房间
-	c.proxy.AddRoute(route.JoinRoom, false, c.joinRoom)
+	c.proxy.AddRouteHandler(route.JoinRoom, false, c.joinRoom)
 }
 
 // 重新连接

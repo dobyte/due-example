@@ -1,0 +1,8 @@
+.idea/
+*/.DS_Store
+.vscode
+docker/*/
+gate-server/log/
+login-server/log/
+game-server/log/
+client/log/

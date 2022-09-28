@@ -6,6 +6,7 @@ import (
 	"github.com/dobyte/due/encoding"
 	"github.com/dobyte/due/encoding/proto"
 	"github.com/dobyte/due/log"
+	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/packet"
@@ -27,6 +28,16 @@ var (
 type handler func(conn network.Conn, buffer []byte)
 
 func init() {
+	// 设置模式
+	mode.SetMode(mode.DebugMode)
+
+	// 设置日志
+	log.SetLogger(log.NewLogger(
+		log.WithOutFile("./log/client.log"),
+		log.WithCallerSkip(1),
+		log.WithOutLevel(log.DebugLevel),
+	))
+
 	codec = encoding.Invoke(proto.Name)
 	handlers = map[int32]handler{
 		route.Register:   registerHandler,
