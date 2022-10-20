@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
+	"github.com/dobyte/due/config"
 	"github.com/dobyte/due/encoding"
 	"github.com/dobyte/due/encoding/proto"
 	"github.com/dobyte/due/log"
@@ -31,13 +32,6 @@ func init() {
 	// 设置模式
 	mode.SetMode(mode.DebugMode)
 
-	// 设置日志
-	log.SetLogger(log.NewLogger(
-		log.WithOutFile("./log/client.log"),
-		log.WithCallerSkip(1),
-		log.WithOutLevel(log.DebugLevel),
-	))
-
 	codec = encoding.Invoke(proto.Name)
 	handlers = map[int32]handler{
 		route.Register:   registerHandler,
@@ -47,7 +41,11 @@ func init() {
 }
 
 func main() {
-	client := ws.NewClient(ws.WithClientDialUrl("ws://127.0.0.1:3553"))
+	// 加载配置
+	config.Load()
+	defer config.Close()
+
+	client := ws.NewClient()
 
 	client.OnConnect(func(conn network.Conn) {
 		log.Infof("connection is opened")
