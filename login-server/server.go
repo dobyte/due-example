@@ -12,19 +12,13 @@ import (
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/config"
 	"github.com/dobyte/due/locate/redis"
-	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/registry/etcd"
 	"github.com/dobyte/due/transport/grpc"
 )
 
-func init() {
-	// 设置模式
-	mode.SetMode(mode.DebugMode)
-}
-
 func main() {
-	// 加载配置
-	config.Load()
+	// 监听配置
+	config.Watch()
 	defer config.Close()
 
 	// 创建容器

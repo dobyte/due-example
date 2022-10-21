@@ -7,7 +7,6 @@ import (
 	"github.com/dobyte/due/encoding"
 	"github.com/dobyte/due/encoding/proto"
 	"github.com/dobyte/due/log"
-	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/packet"
@@ -29,9 +28,6 @@ var (
 type handler func(conn network.Conn, buffer []byte)
 
 func init() {
-	// 设置模式
-	mode.SetMode(mode.DebugMode)
-
 	codec = encoding.Invoke(proto.Name)
 	handlers = map[int32]handler{
 		route.Register:   registerHandler,
@@ -41,8 +37,8 @@ func init() {
 }
 
 func main() {
-	// 加载配置
-	config.Load()
+	// 监听配置
+	config.Watch()
 	defer config.Close()
 
 	client := ws.NewClient()
