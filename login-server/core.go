@@ -56,6 +56,7 @@ func (c *Core) register(req node.Request) {
 
 	res.Code = pb.RegisterCode_Ok
 	res.ID = id
+	res.Account = msg.Account
 }
 
 // 用户登录
@@ -99,4 +100,5 @@ func (c *Core) login(req node.Request) {
 
 	res.Code = pb.LoginCode_Ok
 	res.ID = u.ID
+	res.Account = msg.Account
 }

@@ -32,6 +32,7 @@ message RegisterReq {
 message RegisterRes {
   RegisterCode.Code Code = 1; // 返回码
   int32 ID = 2; // 用户ID
+  string Account = 3; // 账号
 }
 
 // 登录请求
@@ -44,5 +45,6 @@ message LoginReq {
 message LoginRes {
   LoginCode.Code Code = 1; // 返回码
   int32 ID = 2; // 用户ID
+  string Account = 3; // 账号
 }
 

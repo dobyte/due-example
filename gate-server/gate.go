@@ -14,14 +14,13 @@ import (
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/etcd"
-	"github.com/dobyte/due/transport/grpc"
+	"github.com/dobyte/due/transport/rpcx"
 )
 
 func main() {
 	// 监听配置
 	config.Watch()
 	defer config.Close()
-
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件
@@ -29,7 +28,7 @@ func main() {
 		gate.WithServer(ws.NewServer()),
 		gate.WithLocator(redis.NewLocator()),
 		gate.WithRegistry(etcd.NewRegistry()),
-		gate.WithTransporter(grpc.NewTransporter()),
+		gate.WithTransporter(rpcx.NewTransporter()),
 	)
 
 	// 添加网关组件

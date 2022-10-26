@@ -10,6 +10,7 @@ import (
 	"github.com/dobyte/due/network"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/packet"
+	"strconv"
 )
 
 const (
@@ -64,18 +65,22 @@ func main() {
 		handler(conn, message.Buffer)
 	})
 
-	conn, err := client.Dial()
-	if err != nil {
-		log.Fatalf("dial failed: %v", err)
-	}
+	for i := 0; i < 100; i++ {
+		go func(i int) {
+			conn, err := client.Dial()
+			if err != nil {
+				log.Fatalf("dial failed: %v", err)
+			}
 
-	if err = push(conn, route.Register, &pb.RegisterReq{
-		Account:  defaultUserAccount,
-		Password: defaultUserPassword,
-		Nickname: defaultUserNickname,
-		Age:      defaultUserAge,
-	}); err != nil {
-		log.Errorf("push message failed: %v", err)
+			if err = push(conn, route.Register, &pb.RegisterReq{
+				Account:  defaultUserAccount + strconv.Itoa(i+1),
+				Password: defaultUserPassword,
+				Nickname: defaultUserNickname,
+				Age:      defaultUserAge,
+			}); err != nil {
+				log.Errorf("push message failed: %v", err)
+			}
+		}(i)
 	}
 
 	select {}
@@ -99,7 +104,7 @@ func registerHandler(conn network.Conn, buffer []byte) {
 	}
 
 	if err := push(conn, route.Login, &pb.LoginReq{
-		Account:  defaultUserAccount,
+		Account:  res.Account,
 		Password: defaultUserPassword,
 	}); err != nil {
 		log.Errorf("push message failed: %v", err)
