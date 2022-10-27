@@ -19,3 +19,11 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	google.golang.org/genproto v0.0.0-20221018160656-63c7b68cfc55 // indirect
 )
+
+replace (
+	github.com/dobyte/due => ../due
+    github.com/dobyte/due/locate/redis => ../due/locate/redis
+    github.com/dobyte/due/network/ws => ../due/network/ws
+    github.com/dobyte/due/registry/etcd => ../due/registry/etcd
+    github.com/dobyte/due/transport/rpcx => ../due/transport/rpcx
+)

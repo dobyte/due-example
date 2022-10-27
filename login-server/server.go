@@ -11,6 +11,7 @@ import (
 	"github.com/dobyte/due"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/config"
+	"github.com/dobyte/due/crypto/rsa"
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/registry/etcd"
 	"github.com/dobyte/due/transport/rpcx"
@@ -27,6 +28,8 @@ func main() {
 		node.WithLocator(redis.NewLocator()),
 		node.WithRegistry(etcd.NewRegistry()),
 		node.WithTransporter(rpcx.NewTransporter()),
+		node.WithEncryptor(rsa.NewEncryptor()),
+		node.WithDecryptor(rsa.NewDecryptor()),
 	)
 	// 创建业务处理器
 	core := NewCore(component.Proxy())

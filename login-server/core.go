@@ -21,9 +21,9 @@ func NewCore(proxy node.Proxy) *Core {
 
 func (c *Core) Init() {
 	// 用户注册
-	c.proxy.AddRouteHandler(route.Register, false, c.register)
+	c.proxy.AddRouteHandler(route.Register, true, false, c.register)
 	// 用户登录
-	c.proxy.AddRouteHandler(route.Login, false, c.login)
+	c.proxy.AddRouteHandler(route.Login, true, false, c.login)
 }
 
 // 用户注册
