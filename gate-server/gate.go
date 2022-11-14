@@ -30,7 +30,6 @@ func main() {
 		gate.WithRegistry(etcd.NewRegistry()),
 		gate.WithTransporter(rpcx.NewTransporter()),
 	)
-
 	// 添加网关组件
 	container.Add(component)
 	// 启动容器

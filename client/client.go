@@ -1,11 +1,10 @@
 package main
 
 import (
+	_ "github.com/dobyte/due"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due/config"
-	"github.com/dobyte/due/crypto"
-	"github.com/dobyte/due/crypto/rsa"
 	"github.com/dobyte/due/encoding"
 	"github.com/dobyte/due/encoding/proto"
 	"github.com/dobyte/due/log"
@@ -24,19 +23,14 @@ const (
 )
 
 var (
-	codec     encoding.Codec
-	handlers  map[int32]handler
-	encryptor crypto.Encryptor
-	decryptor crypto.Decryptor
+	codec    encoding.Codec
+	handlers map[int32]handler
 )
 
 type handler func(conn network.Conn, buffer []byte)
 
 func init() {
-	config.Watch()
 	codec = encoding.Invoke(proto.Name)
-	encryptor = rsa.NewEncryptor()
-	decryptor = rsa.NewDecryptor()
 	handlers = map[int32]handler{
 		route.Register:   registerHandler,
 		route.Login:      loginHandler,
@@ -45,6 +39,8 @@ func init() {
 }
 
 func main() {
+	// 监听配置
+	config.Watch()
 	defer config.Close()
 
 	client := ws.NewClient()
@@ -70,7 +66,7 @@ func main() {
 		handler(conn, message.Buffer)
 	})
 
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1; i++ {
 		go func(i int) {
 			conn, err := client.Dial()
 			if err != nil {
@@ -92,14 +88,8 @@ func main() {
 }
 
 func registerHandler(conn network.Conn, buffer []byte) {
-	data, err := decryptor.Decrypt(buffer)
-	if err != nil {
-		log.Errorf("decrypt response's message failed, err: %v", err)
-		return
-	}
-
 	res := &pb.RegisterRes{}
-	if err := codec.Unmarshal(data, res); err != nil {
+	if err := codec.Unmarshal(buffer, res); err != nil {
 		log.Errorf("invalid register response message, err: %v", err)
 		return
 	}
@@ -123,14 +113,8 @@ func registerHandler(conn network.Conn, buffer []byte) {
 }
 
 func loginHandler(conn network.Conn, buffer []byte) {
-	data, err := decryptor.Decrypt(buffer)
-	if err != nil {
-		log.Errorf("decrypt response's message failed, err: %v", err)
-		return
-	}
-
 	res := &pb.LoginRes{}
-	if err := codec.Unmarshal(data, res); err != nil {
+	if err := codec.Unmarshal(buffer, res); err != nil {
 		log.Errorf("invalid login response message, err: %v", err)
 		return
 	}
@@ -154,14 +138,8 @@ func loginHandler(conn network.Conn, buffer []byte) {
 }
 
 func createRoomHandler(conn network.Conn, buffer []byte) {
-	data, err := decryptor.Decrypt(buffer)
-	if err != nil {
-		log.Errorf("decrypt response's message failed, err: %v", err)
-		return
-	}
-
 	res := &pb.CreateRoomRes{}
-	if err := codec.Unmarshal(data, res); err != nil {
+	if err := codec.Unmarshal(buffer, res); err != nil {
 		log.Errorf("invalid create room response message, err: %v", err)
 		return
 	}
@@ -179,12 +157,7 @@ func createRoomHandler(conn network.Conn, buffer []byte) {
 }
 
 func push(conn network.Conn, route int32, message interface{}) error {
-	data, err := codec.Marshal(message)
-	if err != nil {
-		return err
-	}
-
-	buffer, err := encryptor.Encrypt(data)
+	buffer, err := codec.Marshal(message)
 	if err != nil {
 		return err
 	}
