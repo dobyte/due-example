@@ -4,7 +4,8 @@ import (
 	_ "github.com/dobyte/due"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
-	"github.com/dobyte/due/config"
+	"github.com/dobyte/due/crypto"
+	"github.com/dobyte/due/crypto/rsa"
 	"github.com/dobyte/due/encoding"
 	"github.com/dobyte/due/encoding/proto"
 	"github.com/dobyte/due/log"
@@ -23,14 +24,18 @@ const (
 )
 
 var (
-	codec    encoding.Codec
-	handlers map[int32]handler
+	codec     encoding.Codec
+	encryptor crypto.Encryptor
+	decryptor crypto.Decryptor
+	handlers  map[int32]handler
 )
 
 type handler func(conn network.Conn, buffer []byte)
 
 func init() {
 	codec = encoding.Invoke(proto.Name)
+	encryptor = rsa.NewEncryptor()
+	decryptor = rsa.NewDecryptor()
 	handlers = map[int32]handler{
 		route.Register:   registerHandler,
 		route.Login:      loginHandler,
@@ -39,9 +44,19 @@ func init() {
 }
 
 func main() {
-	// 监听配置
-	config.Watch()
-	defer config.Close()
+	////str := xrand.Letters(2000)
+	////c, err := encryptor.Encrypt([]byte(str))
+	////if err != nil {
+	////	log.Fatal(err)
+	////}
+	//
+	//d, err := decryptor.Decrypt([]byte("9�����E��͗@ck�:�>���p�ﰫ/S�"))
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//fmt.Println(d)
+	//
+	////fmt.Println(string(d) == str)
 
 	client := ws.NewClient()
 
@@ -63,10 +78,17 @@ func main() {
 			log.Errorf("the route handler is not registered, route:%v", message.Route)
 			return
 		}
-		handler(conn, message.Buffer)
+
+		buffer, err := decryptor.Decrypt(message.Buffer)
+		if err != nil {
+			log.Errorf("decrypt message failed: %v", err)
+			return
+		}
+
+		handler(conn, buffer)
 	})
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 100; i++ {
 		go func(i int) {
 			conn, err := client.Dial()
 			if err != nil {
@@ -158,6 +180,11 @@ func createRoomHandler(conn network.Conn, buffer []byte) {
 
 func push(conn network.Conn, route int32, message interface{}) error {
 	buffer, err := codec.Marshal(message)
+	if err != nil {
+		return err
+	}
+
+	buffer, err = encryptor.Encrypt(buffer)
 	if err != nil {
 		return err
 	}

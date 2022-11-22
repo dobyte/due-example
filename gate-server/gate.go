@@ -10,7 +10,6 @@ package main
 import (
 	"github.com/dobyte/due"
 	"github.com/dobyte/due/cluster/gate"
-	"github.com/dobyte/due/config"
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/etcd"
@@ -18,9 +17,6 @@ import (
 )
 
 func main() {
-	// 监听配置
-	config.Watch()
-	defer config.Close()
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件
