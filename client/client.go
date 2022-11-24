@@ -44,20 +44,6 @@ func init() {
 }
 
 func main() {
-	////str := xrand.Letters(2000)
-	////c, err := encryptor.Encrypt([]byte(str))
-	////if err != nil {
-	////	log.Fatal(err)
-	////}
-	//
-	//d, err := decryptor.Decrypt([]byte("9�����E��͗@ck�:�>���p�ﰫ/S�"))
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//fmt.Println(d)
-	//
-	////fmt.Println(string(d) == str)
-
 	client := ws.NewClient()
 
 	client.OnConnect(func(conn network.Conn) {
