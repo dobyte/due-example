@@ -1,18 +1,14 @@
 package main
 
 import (
+	"github.com/dobyte/due"
 	_ "github.com/dobyte/due"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
-	"github.com/dobyte/due/crypto"
-	"github.com/dobyte/due/crypto/rsa"
-	"github.com/dobyte/due/encoding"
-	"github.com/dobyte/due/encoding/proto"
+	"github.com/dobyte/due/cluster"
+	"github.com/dobyte/due/cluster/client"
 	"github.com/dobyte/due/log"
-	"github.com/dobyte/due/network"
 	"github.com/dobyte/due/network/ws"
-	"github.com/dobyte/due/packet"
-	"strconv"
 )
 
 const (
@@ -23,81 +19,80 @@ const (
 	defaultRoomName     = "room"
 )
 
-var (
-	codec     encoding.Codec
-	encryptor crypto.Encryptor
-	decryptor crypto.Decryptor
-	handlers  map[int32]handler
-)
-
-type handler func(conn network.Conn, buffer []byte)
-
-func init() {
-	codec = encoding.Invoke(proto.Name)
-	encryptor = rsa.NewEncryptor()
-	decryptor = rsa.NewDecryptor()
-	handlers = map[int32]handler{
-		route.Register:   registerHandler,
-		route.Login:      loginHandler,
-		route.CreateRoom: createRoomHandler,
-	}
-}
-
 func main() {
-	client := ws.NewClient()
-
-	client.OnConnect(func(conn network.Conn) {
-		log.Infof("connection is opened")
-	})
-	client.OnDisconnect(func(conn network.Conn) {
-		log.Infof("connection is closed")
-	})
-	client.OnReceive(func(conn network.Conn, msg []byte, msgType int) {
-		message, err := packet.Unpack(msg)
-		if err != nil {
-			log.Errorf("unpack message failed: %v", err)
-			return
-		}
-
-		handler, ok := handlers[message.Route]
-		if !ok {
-			log.Errorf("the route handler is not registered, route:%v", message.Route)
-			return
-		}
-
-		buffer, err := decryptor.Decrypt(message.Buffer)
-		if err != nil {
-			log.Errorf("decrypt message failed: %v", err)
-			return
-		}
-
-		handler(conn, buffer)
-	})
-
-	for i := 0; i < 100; i++ {
-		go func(i int) {
-			conn, err := client.Dial()
-			if err != nil {
-				log.Fatalf("dial failed: %v", err)
-			}
-
-			if err = push(conn, route.Register, &pb.RegisterReq{
-				Account:  defaultUserAccount + strconv.Itoa(i+1),
-				Password: defaultUserPassword,
-				Nickname: defaultUserNickname,
-				Age:      defaultUserAge,
-			}); err != nil {
-				log.Errorf("push message failed: %v", err)
-			}
-		}(i)
-	}
-
-	select {}
+	// 创建容器
+	container := due.NewContainer()
+	// 创建网关组件
+	component := client.NewClient(
+		client.WithClient(ws.NewClient()),
+	)
+	// 初始化事件和路由
+	initEvent(component.Proxy())
+	initRoute(component.Proxy())
+	// 添加网关组件
+	container.Add(component)
+	// 启动容器
+	container.Serve()
 }
 
-func registerHandler(conn network.Conn, buffer []byte) {
+func initEvent(proxy client.Proxy) {
+	// 打开连接
+	proxy.AddEventListener(cluster.Connect, onConnect)
+	// 重新连接
+	proxy.AddEventListener(cluster.Reconnect, onReconnect)
+	// 断开连接
+	proxy.AddEventListener(cluster.Disconnect, onDisconnect)
+}
+
+func onConnect(proxy client.Proxy) {
+	log.Infof("connection is opened")
+
+	err := proxy.Push(0, route.Register, &pb.RegisterReq{
+		Account:  defaultUserAccount,
+		Password: defaultUserPassword,
+		Nickname: defaultUserNickname,
+		Age:      defaultUserAge,
+	})
+	if err != nil {
+		log.Errorf("push login message failed: %v", err)
+	}
+}
+
+func onReconnect(proxy client.Proxy) {
+	log.Infof("connection is reopened")
+
+	err := proxy.Push(0, route.Login, &pb.LoginReq{
+		Account:  defaultUserAccount,
+		Password: defaultUserPassword,
+	})
+	if err != nil {
+		log.Errorf("push login message failed: %v", err)
+	}
+}
+
+func onDisconnect(proxy client.Proxy) {
+	log.Infof("connection is closed")
+
+	err := proxy.Reconnect()
+	if err != nil {
+		log.Errorf("reconnect failed: %v", err)
+	}
+}
+
+func initRoute(proxy client.Proxy) {
+	// 用户注册
+	proxy.AddRouteHandler(route.Register, registerHandler)
+	// 用户登录
+	proxy.AddRouteHandler(route.Login, loginHandler)
+	// 创建房间
+	proxy.AddRouteHandler(route.CreateRoom, createRoomHandler)
+}
+
+func registerHandler(r client.Request) {
 	res := &pb.RegisterRes{}
-	if err := codec.Unmarshal(buffer, res); err != nil {
+
+	err := r.Parse(res)
+	if err != nil {
 		log.Errorf("invalid register response message, err: %v", err)
 		return
 	}
@@ -107,22 +102,25 @@ func registerHandler(conn network.Conn, buffer []byte) {
 		log.Error("user register failed")
 		return
 	case pb.RegisterCode_AccountExists:
-		log.Error("account already exists")
+		log.Warn("account already exists")
 	default:
 		log.Infof("user register successful, UserID: %v", res.ID)
 	}
 
-	if err := push(conn, route.Login, &pb.LoginReq{
-		Account:  res.Account,
+	err = r.Proxy().Push(0, route.Login, &pb.LoginReq{
+		Account:  defaultUserAccount,
 		Password: defaultUserPassword,
-	}); err != nil {
-		log.Errorf("push message failed: %v", err)
+	})
+	if err != nil {
+		log.Errorf("push login message failed: %v", err)
 	}
 }
 
-func loginHandler(conn network.Conn, buffer []byte) {
+func loginHandler(r client.Request) {
 	res := &pb.LoginRes{}
-	if err := codec.Unmarshal(buffer, res); err != nil {
+
+	err := r.Parse(res)
+	if err != nil {
 		log.Errorf("invalid login response message, err: %v", err)
 		return
 	}
@@ -138,16 +136,19 @@ func loginHandler(conn network.Conn, buffer []byte) {
 		log.Infof("user login successful, UserID: %v", res.ID)
 	}
 
-	if err := push(conn, route.CreateRoom, &pb.CreateRoomReq{
+	err = r.Proxy().Push(0, route.CreateRoom, &pb.CreateRoomReq{
 		Name: defaultRoomName,
-	}); err != nil {
-		log.Errorf("push message failed: %v", err)
+	})
+	if err != nil {
+		log.Errorf("push create room message failed: %v", err)
 	}
 }
 
-func createRoomHandler(conn network.Conn, buffer []byte) {
+func createRoomHandler(r client.Request) {
 	res := &pb.CreateRoomRes{}
-	if err := codec.Unmarshal(buffer, res); err != nil {
+
+	err := r.Parse(res)
+	if err != nil {
 		log.Errorf("invalid create room response message, err: %v", err)
 		return
 	}
@@ -155,33 +156,9 @@ func createRoomHandler(conn network.Conn, buffer []byte) {
 	switch res.Code {
 	case pb.CreateRoomCode_Failed:
 		log.Error("create room failed")
-		return
 	case pb.CreateRoomCode_NameExists:
-		log.Error("room name already exists")
-		return
+		log.Warn("room name already exists")
 	default:
 		log.Infof("create room successful, RoomID: %v", res.ID)
 	}
-}
-
-func push(conn network.Conn, route int32, message interface{}) error {
-	buffer, err := codec.Marshal(message)
-	if err != nil {
-		return err
-	}
-
-	buffer, err = encryptor.Encrypt(buffer)
-	if err != nil {
-		return err
-	}
-
-	msg, err := packet.Pack(&packet.Message{
-		Route:  route,
-		Buffer: buffer,
-	})
-	if err != nil {
-		return err
-	}
-
-	return conn.Push(msg)
 }

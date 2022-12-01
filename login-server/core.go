@@ -1,8 +1,6 @@
 package main
 
 import (
-	"context"
-
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due-example/internal/user"
@@ -27,55 +25,55 @@ func (c *Core) Init() {
 }
 
 // 用户注册
-func (c *Core) register(req node.Request) {
-	msg := &pb.RegisterReq{}
+func (c *Core) register(r node.Request) {
+	req := &pb.RegisterReq{}
 	res := &pb.RegisterRes{}
 	defer func() {
-		if err := req.Response(res); err != nil {
+		if err := r.Response(res); err != nil {
 			log.Errorf("response register message failed, err: %v", err)
 		}
 	}()
 
-	if err := req.Parse(msg); err != nil {
+	if err := r.Parse(req); err != nil {
 		log.Errorf("invalid register message, err: %v", err)
 		res.Code = pb.RegisterCode_Failed
 		return
 	}
 
-	if c.um.HasUser(msg.Account) {
+	if c.um.HasUser(req.Account) {
 		res.Code = pb.RegisterCode_AccountExists
 		return
 	}
 
 	id := c.um.AddUser(&user.User{
-		Account:  msg.Account,
-		Password: msg.Password,
-		Nickname: msg.Nickname,
-		Age:      int(msg.Age),
+		Account:  req.Account,
+		Password: req.Password,
+		Nickname: req.Nickname,
+		Age:      int(req.Age),
 	})
 
 	res.Code = pb.RegisterCode_Ok
 	res.ID = id
-	res.Account = msg.Account
+	res.Account = req.Account
 }
 
 // 用户登录
-func (c *Core) login(req node.Request) {
-	msg := &pb.LoginReq{}
+func (c *Core) login(r node.Request) {
+	req := &pb.LoginReq{}
 	res := &pb.LoginRes{}
 	defer func() {
-		if err := req.Response(res); err != nil {
+		if err := r.Response(res); err != nil {
 			log.Errorf("response login message failed, err: %v", err)
 		}
 	}()
 
-	if err := req.Parse(msg); err != nil {
+	if err := r.Parse(req); err != nil {
 		log.Errorf("invalid login message, err: %v", err)
 		res.Code = pb.LoginCode_Failed
 		return
 	}
 
-	u, err := c.um.GetUser(msg.Account)
+	u, err := c.um.GetUser(req.Account)
 	if err != nil {
 		switch err {
 		case user.ErrNotFoundUser:
@@ -86,19 +84,17 @@ func (c *Core) login(req node.Request) {
 		return
 	}
 
-	if u.Password != msg.Password {
+	if u.Password != req.Password {
 		res.Code = pb.LoginCode_IncorrectAccountOrPassword
 		return
 	}
 
-	gid, cid := req.GID(), req.CID()
-
-	if err = c.proxy.BindGate(context.Background(), gid, cid, int64(u.ID)); err != nil {
+	if err = r.BindGate(int64(u.ID)); err != nil {
 		log.Errorf("bind gate failed: %v", err)
 		return
 	}
 
 	res.Code = pb.LoginCode_Ok
 	res.ID = u.ID
-	res.Account = msg.Account
+	res.Account = req.Account
 }
