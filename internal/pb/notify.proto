@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+// 通知消息
+message Notify {
+  string Message = 1; // 消息内容
+}

@@ -86,6 +86,8 @@ func initRoute(proxy client.Proxy) {
 	proxy.AddRouteHandler(route.Login, loginHandler)
 	// 创建房间
 	proxy.AddRouteHandler(route.CreateRoom, createRoomHandler)
+	// 通知消息
+	proxy.AddRouteHandler(route.NotifyMessage, notifyMessageHandler)
 }
 
 func registerHandler(r client.Request) {
@@ -161,4 +163,16 @@ func createRoomHandler(r client.Request) {
 	default:
 		log.Infof("create room successful, RoomID: %v", res.ID)
 	}
+}
+
+func notifyMessageHandler(r client.Request) {
+	msg := &pb.Notify{}
+
+	err := r.Parse(msg)
+	if err != nil {
+		log.Errorf("invalid notify message, err: %v", err)
+		return
+	}
+
+	log.Infof("received a message from admin: %s", msg.Message)
 }

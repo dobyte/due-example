@@ -5,7 +5,7 @@
  * @Desc: TODO
  */
 
-package room
+package entity
 
 import (
 	"errors"

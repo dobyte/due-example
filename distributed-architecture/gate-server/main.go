@@ -20,14 +20,14 @@ func main() {
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件
-	component := gate.NewGate(
+	g := gate.NewGate(
 		gate.WithServer(ws.NewServer()),
 		gate.WithLocator(redis.NewLocator()),
 		gate.WithRegistry(etcd.NewRegistry()),
 		gate.WithTransporter(rpcx.NewTransporter()),
 	)
 	// 添加网关组件
-	container.Add(component)
+	container.Add(g)
 	// 启动容器
 	container.Serve()
 }

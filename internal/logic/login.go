@@ -1,6 +1,7 @@
-package main
+package logic
 
 import (
+	"fmt"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due-example/internal/user"
@@ -8,24 +9,24 @@ import (
 	"github.com/dobyte/due/log"
 )
 
-type Core struct {
-	um    *user.Manager
+type login struct {
 	proxy node.Proxy
+	um    *user.Manager
 }
 
-func NewCore(proxy node.Proxy) *Core {
-	return &Core{proxy: proxy, um: user.NewManager()}
+func NewLogin(proxy node.Proxy) *login {
+	return &login{proxy: proxy, um: user.NewManager()}
 }
 
-func (c *Core) Init() {
+func (l *login) Init() {
 	// 用户注册
-	c.proxy.AddRouteHandler(route.Register, false, c.register)
+	l.proxy.AddRouteHandler(route.Register, false, l.register)
 	// 用户登录
-	c.proxy.AddRouteHandler(route.Login, false, c.login)
+	l.proxy.AddRouteHandler(route.Login, false, l.login)
 }
 
 // 用户注册
-func (c *Core) register(r node.Request) {
+func (l *login) register(r node.Request) {
 	req := &pb.RegisterReq{}
 	res := &pb.RegisterRes{}
 	defer func() {
@@ -34,18 +35,23 @@ func (c *Core) register(r node.Request) {
 		}
 	}()
 
+	fmt.Printf("GID:%s", r.GID())
+	fmt.Printf("NID:%s", r.NID())
+	fmt.Printf("CID:%d", r.CID())
+	fmt.Printf("UID:%d", r.UID())
+
 	if err := r.Parse(req); err != nil {
 		log.Errorf("invalid register message, err: %v", err)
 		res.Code = pb.RegisterCode_Failed
 		return
 	}
 
-	if c.um.HasUser(req.Account) {
+	if l.um.HasUser(req.Account) {
 		res.Code = pb.RegisterCode_AccountExists
 		return
 	}
 
-	id := c.um.AddUser(&user.User{
+	id := l.um.AddUser(&user.User{
 		Account:  req.Account,
 		Password: req.Password,
 		Nickname: req.Nickname,
@@ -58,7 +64,7 @@ func (c *Core) register(r node.Request) {
 }
 
 // 用户登录
-func (c *Core) login(r node.Request) {
+func (l *login) login(r node.Request) {
 	req := &pb.LoginReq{}
 	res := &pb.LoginRes{}
 	defer func() {
@@ -73,7 +79,7 @@ func (c *Core) login(r node.Request) {
 		return
 	}
 
-	u, err := c.um.GetUser(req.Account)
+	u, err := l.um.GetUser(req.Account)
 	if err != nil {
 		switch err {
 		case user.ErrNotFoundUser:

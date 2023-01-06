@@ -1,24 +1,24 @@
-package main
+package logic
 
 import (
+	"github.com/dobyte/due-example/internal/entity"
 	"github.com/dobyte/due-example/internal/pb"
-	"github.com/dobyte/due-example/internal/room"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due/cluster"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/log"
 )
 
-type Core struct {
-	rm    *room.Manager
+type room struct {
+	rm    *entity.Manager
 	proxy node.Proxy
 }
 
-func NewCore(proxy node.Proxy) *Core {
-	return &Core{proxy: proxy, rm: room.NewManager()}
+func NewRoom(proxy node.Proxy) *room {
+	return &room{proxy: proxy, rm: entity.NewManager()}
 }
 
-func (c *Core) Init() {
+func (c *room) Init() {
 	// 监听重新连接
 	c.proxy.AddEventListener(cluster.Reconnect, c.reconnect)
 	// 监听连接断开
@@ -30,17 +30,17 @@ func (c *Core) Init() {
 }
 
 // 重新连接
-func (c *Core) reconnect(gid string, uid int64) {
+func (c *room) reconnect(gid string, uid int64) {
 	log.Warnf("connection is reopened, gid: %v, uid: %d", gid, uid)
 }
 
 // 连接断开
-func (c *Core) disconnect(gid string, uid int64) {
+func (c *room) disconnect(gid string, uid int64) {
 	log.Warnf("connection is closed, gid: %v, uid: %d", gid, uid)
 }
 
 // 创建房间
-func (c *Core) createRoom(req node.Request) {
+func (c *room) createRoom(req node.Request) {
 	msg := &pb.CreateRoomReq{}
 	res := &pb.CreateRoomRes{}
 	defer func() {
@@ -61,7 +61,7 @@ func (c *Core) createRoom(req node.Request) {
 		return
 	}
 
-	id := c.rm.AddRoom(&room.Room{
+	id := c.rm.AddRoom(&entity.Room{
 		Name: msg.Name,
 	})
 
@@ -70,6 +70,6 @@ func (c *Core) createRoom(req node.Request) {
 }
 
 // 加入房间
-func (c *Core) joinRoom(req node.Request) {
-
+func (c *room) joinRoom(req node.Request) {
+	// todo
 }

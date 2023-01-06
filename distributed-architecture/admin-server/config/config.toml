@@ -1,16 +1,37 @@
 [cluster]
-    # 集群客户端配置，常用于调试使用
-    [cluster.client]
-        # 实例ID，网关集群中唯一。不填写默认自动生成唯一的实例ID
-        id = ""
+    # 集群节点配置
+    [cluster.master]
         # 实例名称
-        name = "client"
+        name = "master"
         # 编解码器。可选：json | proto
         codec = "proto"
-        # 加密器。可选：rsa | ecc
+        # 加密器。不设置，则不对发送给客户端的消息进行加密。可选：rsa
         encryptor = "rsa"
-        # 解密器。可选：rsa | ecc
+        # 解密器。不设置，则不对客户端发送的消息进行加密。可选：rsa
         decryptor = "rsa"
+[transport]
+    # GRPC相关配置
+    [transport.grpc]
+        # GRPC服务器相关配置
+        [transport.grpc.server]
+            # 服务器监听地址
+            addr = ":8662"
+            # 秘钥文件
+            keyFile = ""
+            # 证书文件
+            certFile = ""
+        # GRPC客户端相关配置
+        [transport.grpc.client]
+            # 证书文件
+            certFile = ""
+            # 证书域名
+            serverName = ""
+    # RPCX相关配置
+    [transport.rpcx]
+        # RPCX服务器相关配置
+        [transport.rpcx.server]
+            # 服务器监听地址
+            addr = ":8662"
 [packet]
     # 字节序，little | big
     endian = "big"
@@ -42,19 +63,34 @@
     # 是否启用分级存储
     classifiedStorage = true
     # zap日志组件。以下配置项如果不存在，则会使用log域中的默认配置项；如果均未配置，则会使用系统默认配置
-[network]
-    [network.ws]
-        [network.ws.client]
-            # 拨号地址
-            url = "ws://127.0.0.1:3553"
-            # 最大消息长度（字节），默认1kb
-            maxMsgLen = 1024
-            # 握手超时时间（秒）
-            handshakeTimeout = 10
-            # 是否启用心跳，默认不启用
-            heartbeat = true
-            # 心跳间隔时间（秒），默认为10秒
-            heartbeatInterval = 10
+[locate]
+    [locate.redis]
+        # 客户端连接地址
+        addrs = ["127.0.0.1:6379"]
+        # 数据库号
+        db = 0
+        # 用户名
+        username = ""
+        # 密码
+        password = ""
+        # 最大重试次数
+        maxRetries = 3
+        # key前缀
+        prefix = "due"
+[registry]
+    [registry.etcd]
+        # 客户端连接地址
+        addrs = ["127.0.0.1:2379"]
+        # 客户端拨号超时时间（秒）
+        dialTimeout = 5
+        # 命名空间
+        namespace = "services"
+        # 超时时间（秒）
+        timeout = 3
+        # 心跳重试次数
+        retryTimes = 3
+        # 心跳重试间隔（秒）
+        retryInterval = 10
 [crypto]
     [crypto.rsa]
         # RSA加密设置
@@ -79,3 +115,8 @@
             label = ""
             # 私钥。可设置文件路径或私钥串
             privateKey = "./pem/key.pem"
+
+############################自定义配置############################
+[http]
+    # 后台HTTP监听端口
+    addr = ":8081"

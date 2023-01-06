@@ -1,14 +1,8 @@
-/**
- * @Author: fuxiao
- * @Email: 576101059@qq.com
- * @Date: 2022/6/15 20:42
- * @Desc: 登录服务器
- */
-
 package main
 
 import (
 	"github.com/dobyte/due"
+	"github.com/dobyte/due-example/distributed-architecture/game-server/route"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/registry/etcd"
@@ -19,17 +13,15 @@ func main() {
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件
-	component := node.NewNode(
+	n := node.NewNode(
 		node.WithLocator(redis.NewLocator()),
 		node.WithRegistry(etcd.NewRegistry()),
 		node.WithTransporter(rpcx.NewTransporter()),
 	)
-	// 创建业务处理器
-	core := NewCore(component.Proxy())
-	// 初始化业务
-	core.Init()
+	// 初始化路由
+	route.Init(n.Proxy())
 	// 添加网关组件
-	container.Add(component)
+	container.Add(n)
 	// 启动容器
 	container.Serve()
 }

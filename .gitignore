@@ -2,7 +2,8 @@
 */.DS_Store
 .vscode
 docker/*/
-gate-server/log/
-login-server/log/
-game-server/log/
+distributed-architecture/admin-server/log/
+distributed-architecture/gate-server/log/
+distributed-architecture/login-server/log/
+distributed-architecture/game-server/log/
 client/log/
