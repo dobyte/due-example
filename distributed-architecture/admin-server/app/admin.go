@@ -11,11 +11,11 @@ import (
 
 type Admin struct {
 	component.Base
-	proxy  master.Proxy
+	proxy  *master.Proxy
 	engine *gin.Engine
 }
 
-func NewAdmin(proxy master.Proxy) *Admin {
+func NewAdmin(proxy *master.Proxy) *Admin {
 	return &Admin{proxy: proxy, engine: gin.Default()}
 }
 

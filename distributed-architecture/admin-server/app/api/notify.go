@@ -12,10 +12,10 @@ import (
 )
 
 type Notify struct {
-	proxy master.Proxy
+	proxy *master.Proxy
 }
 
-func NewNotify(proxy master.Proxy) *Notify {
+func NewNotify(proxy *master.Proxy) *Notify {
 	return &Notify{proxy: proxy}
 }
 

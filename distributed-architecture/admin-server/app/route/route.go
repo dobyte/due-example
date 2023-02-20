@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Init(proxy master.Proxy, engine *gin.Engine) {
+func Init(proxy *master.Proxy, engine *gin.Engine) {
 	var (
 		notifyAPI = api.NewNotify(proxy)
 	)
