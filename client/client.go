@@ -56,6 +56,13 @@ func onConnect(proxy client.Proxy) {
 	if err != nil {
 		log.Errorf("push login message failed: %v", err)
 	}
+
+	//err := proxy.Push(0, route.CreateRoom, &pb.CreateRoomReq{
+	//	Name: defaultRoomName,
+	//})
+	//if err != nil {
+	//	log.Errorf("push create room message failed: %v", err)
+	//}
 }
 
 func onReconnect(proxy client.Proxy) {
@@ -88,6 +95,12 @@ func initRoute(proxy client.Proxy) {
 	proxy.AddRouteHandler(route.CreateRoom, createRoomHandler)
 	// 通知消息
 	proxy.AddRouteHandler(route.NotifyMessage, notifyMessageHandler)
+	// 用户未授权
+	proxy.AddRouteHandler(route.Unauthorized, unauthorizedHandler)
+}
+
+func unauthorizedHandler(r client.Request) {
+	log.Errorf("the user request is not authorized")
 }
 
 func registerHandler(r client.Request) {

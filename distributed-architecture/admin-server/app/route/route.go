@@ -11,6 +11,8 @@ func Init(proxy master.Proxy, engine *gin.Engine) {
 		notifyAPI = api.NewNotify(proxy)
 	)
 
+	engine.Use()
+
 	// 发送消息
 	engine.POST("push", notifyAPI.Push)
 	// 组播消息

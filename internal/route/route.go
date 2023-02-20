@@ -6,4 +6,5 @@ const (
 	CreateRoom                     // 创建房间
 	JoinRoom                       // 加入房间
 	NotifyMessage                  // 通知消息
+	Unauthorized                   // 用户未授权
 )

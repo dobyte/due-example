@@ -5,7 +5,7 @@ import (
 	"github.com/dobyte/due-example/distributed-architecture/game-server/route"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/locate/redis"
-	"github.com/dobyte/due/registry/etcd"
+	"github.com/dobyte/due/registry/consul"
 	"github.com/dobyte/due/transport/rpcx"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	// 创建网关组件
 	n := node.NewNode(
 		node.WithLocator(redis.NewLocator()),
-		node.WithRegistry(etcd.NewRegistry()),
+		node.WithRegistry(consul.NewRegistry()),
 		node.WithTransporter(rpcx.NewTransporter()),
 	)
 	// 初始化路由

@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"fmt"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due-example/internal/user"
@@ -10,37 +9,34 @@ import (
 )
 
 type login struct {
-	proxy node.Proxy
+	proxy *node.Proxy
 	um    *user.Manager
 }
 
-func NewLogin(proxy node.Proxy) *login {
+func NewLogin(proxy *node.Proxy) *login {
 	return &login{proxy: proxy, um: user.NewManager()}
 }
 
 func (l *login) Init() {
-	// 用户注册
-	l.proxy.AddRouteHandler(route.Register, false, l.register)
-	// 用户登录
-	l.proxy.AddRouteHandler(route.Login, false, l.login)
+	l.proxy.Router().Group(func(group *node.RouterGroup) {
+		// 用户注册
+		group.AddRouteHandler(route.Register, false, l.register)
+		// 用户登录
+		group.AddRouteHandler(route.Login, false, l.login)
+	})
 }
 
 // 用户注册
-func (l *login) register(r node.Request) {
+func (l *login) register(ctx *node.Context) {
 	req := &pb.RegisterReq{}
 	res := &pb.RegisterRes{}
 	defer func() {
-		if err := r.Response(res); err != nil {
+		if err := ctx.Response(res); err != nil {
 			log.Errorf("response register message failed, err: %v", err)
 		}
 	}()
 
-	fmt.Printf("GID:%s", r.GID())
-	fmt.Printf("NID:%s", r.NID())
-	fmt.Printf("CID:%d", r.CID())
-	fmt.Printf("UID:%d", r.UID())
-
-	if err := r.Parse(req); err != nil {
+	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid register message, err: %v", err)
 		res.Code = pb.RegisterCode_Failed
 		return
@@ -64,16 +60,16 @@ func (l *login) register(r node.Request) {
 }
 
 // 用户登录
-func (l *login) login(r node.Request) {
+func (l *login) login(ctx *node.Context) {
 	req := &pb.LoginReq{}
 	res := &pb.LoginRes{}
 	defer func() {
-		if err := r.Response(res); err != nil {
+		if err := ctx.Response(res); err != nil {
 			log.Errorf("response login message failed, err: %v", err)
 		}
 	}()
 
-	if err := r.Parse(req); err != nil {
+	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid login message, err: %v", err)
 		res.Code = pb.LoginCode_Failed
 		return
@@ -95,7 +91,7 @@ func (l *login) login(r node.Request) {
 		return
 	}
 
-	if err = r.BindGate(int64(u.ID)); err != nil {
+	if err = ctx.BindGate(int64(u.ID)); err != nil {
 		log.Errorf("bind gate failed: %v", err)
 		return
 	}
