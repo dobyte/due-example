@@ -132,6 +132,16 @@ github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8
 github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91/go.mod h1:2pZnwuY/m+8K6iRw6wQdMtk+rH5tNGR1i55kozfMjCc=
 github.com/dnaeon/go-vcr v1.1.0/go.mod h1:M7tiix8f0r6mKKJ3Yq/kqU1OYf3MnfmBWVbPx/yU9ko=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
+github.com/dobyte/due v0.0.10 h1:NvILtPV7HlvD3dU+dbjXeJxDPLqyt/+v2hwWz5XVrnM=
+github.com/dobyte/due v0.0.10/go.mod h1:+eKzq38okIhvcoQ1sw4h0vQtMFtJbl6xhJgasia8NWA=
+github.com/dobyte/due/locate/redis v0.0.0-20230221014826-f2747a572641 h1:U7dLGBICXODIbzfnO/KD6ucM+8ko1/fNrKmIB0c7fB0=
+github.com/dobyte/due/locate/redis v0.0.0-20230221014826-f2747a572641/go.mod h1:F+4WO7OhkpfnnI3quUcoxHJJNLdKZVjcTCrvFf6GEHg=
+github.com/dobyte/due/network/ws v0.0.0-20230221014826-f2747a572641 h1:PVha9iSRf9El209r3yuM2iIBZlNJjpKG9lp7z6ie30g=
+github.com/dobyte/due/network/ws v0.0.0-20230221014826-f2747a572641/go.mod h1:7lWMnbdoadZi9md7cpMG15T8GXWTaUV+3YxW6AtcBxk=
+github.com/dobyte/due/registry/consul v0.0.0-20230221014826-f2747a572641 h1:8R5srkARzekj53Td7AI55U01oKhD/I50Y4afSAz1okA=
+github.com/dobyte/due/registry/consul v0.0.0-20230221014826-f2747a572641/go.mod h1:k7J1yc4vPyXQdXwrkRjkbAQ6mIz2H2M4DxSMrTsIcSA=
+github.com/dobyte/due/transport/rpcx v0.0.0-20230221014826-f2747a572641 h1:TXYcR1QKCP8ehZvx/ZSAv0+6bQE9cxmrfJ47xoWr9zo=
+github.com/dobyte/due/transport/rpcx v0.0.0-20230221014826-f2747a572641/go.mod h1:2fh+5JTE5e9I7DFpsq9dkgakoEZgqQRCyfi8Z33rEO4=
 github.com/docker/docker v1.6.2/go.mod h1:eEKB0N0r5NX/I1kEveEz05bcu8tLC/8azJZsviup8Sk=
 github.com/dop251/goja v0.0.0-20220405120441-9037c2b61cbf/go.mod h1:R9ET47fwRVRPZnOGvHxxhuZcbrMCuiqOz3Rlrh4KSnk=
 github.com/dop251/goja_nodejs v0.0.0-20210225215109-d91c329300e7/go.mod h1:hn7BA7c8pLvoGndExHudxTDKZ84Pyvv+90pbBjbTz0Y=
@@ -216,7 +226,6 @@ github.com/gogo/protobuf v1.3.2/go.mod h1:P1XiOD3dCwIKUDQYPy72D8LYyHL2YPYrpS2s69
 github.com/golang-jwt/jwt/v4 v4.3.0/go.mod h1:/xlHOz8bRuivTWchD4jCa+NbatV+wEUSzwAxVc6locg=
 github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0/go.mod h1:E/TSTwGwJL78qG/PmXZO1EjYhfJinVAhrmmHX6Z8B9k=
 github.com/golang/geo v0.0.0-20190916061304-5b978397cfec/go.mod h1:QZ0nwyI2jOfgRAoBvP+ab5aRr7c9x7lhGEJrKvBwjWI=
-github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b h1:VKtxabqXZkF25pY9ekfRL6a582T4P37/31XEstQ5p58=
 github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b/go.mod h1:SBH7ygxi8pfUlaOkMMuAQtPIUF8ecWP5IEl/CR7VP2Q=
 github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/golang/groupcache v0.0.0-20191227052852-215e87163ea7/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
