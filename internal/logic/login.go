@@ -1,10 +1,12 @@
 package logic
 
 import (
+	"github.com/dobyte/due-example/internal/event"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due-example/internal/user"
 	"github.com/dobyte/due/cluster/node"
+	"github.com/dobyte/due/eventbus"
 	"github.com/dobyte/due/log"
 )
 
@@ -96,7 +98,15 @@ func (l *login) login(ctx *node.Context) {
 		return
 	}
 
+	err = eventbus.Publish(ctx.Context(), event.Login, &event.LoginPayload{
+		ID:      u.ID,
+		Account: u.Account,
+	})
+	if err != nil {
+		log.Errorf("%s event push failed: %v", event.Login, err)
+	}
+
 	res.Code = pb.LoginCode_Ok
 	res.ID = u.ID
-	res.Account = req.Account
+	res.Account = u.Account
 }
