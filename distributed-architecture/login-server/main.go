@@ -12,7 +12,7 @@ import (
 	"github.com/dobyte/due-example/distributed-architecture/login-server/business"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/eventbus"
-	"github.com/dobyte/due/eventbus/nats"
+	"github.com/dobyte/due/eventbus/kafka"
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/registry/consul"
 	"github.com/dobyte/due/transport/rpcx"
@@ -20,7 +20,7 @@ import (
 
 func main() {
 	// 初始化事件总线
-	eventbus.SetEventbus(nats.NewEventbus())
+	eventbus.SetEventbus(kafka.NewEventbus())
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件

@@ -11,12 +11,14 @@ import (
 	"github.com/dobyte/due"
 	"github.com/dobyte/due/cluster/gate"
 	"github.com/dobyte/due/locate/redis"
+	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/consul"
 	"github.com/dobyte/due/transport/rpcx"
 )
 
 func main() {
+	mode.SetMode(mode.DebugMode)
 	// 创建容器
 	container := due.NewContainer()
 	// 创建网关组件
