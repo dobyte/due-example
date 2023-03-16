@@ -15,15 +15,22 @@ import (
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/consul"
 	"github.com/dobyte/due/transport/rpcx"
+	"net/http"
 )
 
 func main() {
 	mode.SetMode(mode.DebugMode)
 	// 创建容器
 	container := due.NewContainer()
+	// 创建服务器
+	server := ws.NewServer()
+	// 监听HTTP连接升级WS协议
+	server.OnUpgrade(func(w http.ResponseWriter, r *http.Request) bool {
+		return true
+	})
 	// 创建网关组件
 	g := gate.NewGate(
-		gate.WithServer(ws.NewServer()),
+		gate.WithServer(server),
 		gate.WithLocator(redis.NewLocator()),
 		gate.WithRegistry(consul.NewRegistry()),
 		gate.WithTransporter(rpcx.NewTransporter()),
