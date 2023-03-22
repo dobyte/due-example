@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"fmt"
 	"github.com/dobyte/due-example/internal/event"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
@@ -38,6 +39,8 @@ func (l *login) register(ctx *node.Context) {
 		}
 	}()
 
+	panic("register")
+
 	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid register message, err: %v", err)
 		res.Code = pb.RegisterCode_Failed
@@ -70,6 +73,10 @@ func (l *login) login(ctx *node.Context) {
 			log.Errorf("response login message failed, err: %v", err)
 		}
 	}()
+
+	nums := []int{1, 2, 3}
+	var index = 4
+	fmt.Println(nums[index])
 
 	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid login message, err: %v", err)

@@ -13,7 +13,7 @@ import (
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network/ws"
-	"github.com/dobyte/due/registry/consul"
+	"github.com/dobyte/due/registry/etcd"
 	"github.com/dobyte/due/transport/rpcx"
 	"net/http"
 )
@@ -32,7 +32,7 @@ func main() {
 	g := gate.NewGate(
 		gate.WithServer(server),
 		gate.WithLocator(redis.NewLocator()),
-		gate.WithRegistry(consul.NewRegistry()),
+		gate.WithRegistry(etcd.NewRegistry()),
 		gate.WithTransporter(rpcx.NewTransporter()),
 	)
 	// 添加网关组件
