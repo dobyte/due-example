@@ -1,10 +1,11 @@
 package logic
 
 import (
-	"fmt"
 	"github.com/dobyte/due-example/internal/event"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
+	"github.com/dobyte/due-example/internal/service/grpc/wallet"
+	walletpb "github.com/dobyte/due-example/internal/service/grpc/wallet/pb"
 	"github.com/dobyte/due-example/internal/user"
 	"github.com/dobyte/due/cluster/node"
 	"github.com/dobyte/due/eventbus"
@@ -39,8 +40,6 @@ func (l *login) register(ctx *node.Context) {
 		}
 	}()
 
-	panic("register")
-
 	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid register message, err: %v", err)
 		res.Code = pb.RegisterCode_Failed
@@ -73,10 +72,6 @@ func (l *login) login(ctx *node.Context) {
 			log.Errorf("response login message failed, err: %v", err)
 		}
 	}()
-
-	nums := []int{1, 2, 3}
-	var index = 4
-	fmt.Println(nums[index])
 
 	if err := ctx.Request.Parse(req); err != nil {
 		log.Errorf("invalid login message, err: %v", err)
@@ -111,6 +106,20 @@ func (l *login) login(ctx *node.Context) {
 	})
 	if err != nil {
 		log.Errorf("%s event push failed: %v", event.Login, err)
+	}
+
+	cli, err := wallet.NewClient(l.proxy.NewServiceClient)
+	if err != nil {
+		log.Errorf("")
+	} else {
+		coin := int64(10)
+		_, err = cli.IncrCoin(ctx.Context(), &walletpb.IncrCoinRequest{
+			UID:  int64(u.ID),
+			Coin: coin,
+		})
+		if err != nil {
+			log.Errorf("incr %d coin for %d failed: %v", coin, u.ID, err)
+		}
 	}
 
 	res.Code = pb.LoginCode_Ok

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "./pb";
+
+package pb;
+
+service Wallet {
+  // 增加金币
+  rpc IncrCoin(IncrCoinRequest) returns (IncrCoinReply) {}
+  // 减少金币
+  rpc DecrCoin(DecrCoinRequest) returns (DecrCoinReply) {}
+}
+
+message IncrCoinRequest {
+  int64 UID = 1; // 用户ID
+  int64 Coin = 2; // 金币数额
+}
+
+message IncrCoinReply {
+}
+
+message DecrCoinRequest {
+  int64 UID = 1; // 用户ID
+  int64 Coin = 2; // 金币数额
+}
+
+message DecrCoinReply {
+}

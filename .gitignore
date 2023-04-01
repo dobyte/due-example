@@ -6,4 +6,5 @@ distributed-architecture/admin-server/log/
 distributed-architecture/gate-server/log/
 distributed-architecture/login-server/log/
 distributed-architecture/game-server/log/
+distributed-architecture/mesh-server/log/
 client/log/

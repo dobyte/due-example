@@ -1,10 +1,8 @@
 [cluster]
     # 集群节点配置
-    [cluster.node]
-        # 实例ID，节点集群中唯一。不填写默认自动生成唯一的实例ID
-        id = ""
+    [cluster.mesh]
         # 实例名称
-        name = "game"
+        name = "mesh"
         # 编解码器。可选：json | proto
         codec = "proto"
         # 加密器。不设置，则不对发送给客户端的消息进行加密。可选：rsa
@@ -17,7 +15,7 @@
         # GRPC服务器相关配置
         [transport.grpc.server]
             # 服务器监听地址
-            addr = ":8663"
+            addr = ":8664"
             # 秘钥文件
             keyFile = ""
             # 证书文件
@@ -33,7 +31,7 @@
         # RPCX服务器相关配置
         [transport.rpcx.server]
             # 服务器监听地址
-            addr = ":8663"
+            addr = ":8664"
 [packet]
     # 字节序，little | big
     endian = "big"
@@ -93,6 +91,21 @@
         retryTimes = 3
         # 心跳重试间隔（秒）
         retryInterval = 10
+    [registry.consul]
+        # 客户端连接地址
+        addr = "127.0.0.1:8500"
+        # 是否启用健康检查
+        healthCheck = true
+        # 健康检查时间间隔（秒），仅在启用健康检查后生效
+        healthCheckInterval = 10
+        # 健康检查超时时间（秒），仅在启用健康检查后生效
+        healthCheckTimeout = 5
+        # 是否启用心跳检查
+        heartbeatCheck = true
+        # 心跳检查时间间隔（秒），仅在启用心跳检查后生效
+        heartbeatCheckInterval = 10
+        # 健康检测失败后自动注销服务时间（秒）
+        deregisterCriticalServiceAfter = 30
 [crypto]
     [crypto.rsa]
         # RSA加密设置
