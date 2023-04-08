@@ -11,8 +11,6 @@ import (
 	"github.com/dobyte/due"
 	"github.com/dobyte/due-example/distributed-architecture/login-server/business"
 	cluster "github.com/dobyte/due/cluster/node"
-	"github.com/dobyte/due/eventbus"
-	"github.com/dobyte/due/eventbus/kafka"
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/registry/consul"
@@ -23,13 +21,13 @@ func main() {
 	// 开启调试模式
 	mode.SetMode(mode.DebugMode)
 	// 初始化事件总线
-	eventbus.SetEventbus(kafka.NewEventbus())
+	//eventbus.SetEventbus(kafka.NewEventbus())
 	// 创建用户定位器
 	locator := redis.NewLocator()
 	// 创建服务发现
 	registry := consul.NewRegistry()
 	// 创建RPC传输器
-	transporter := grpc.NewTransporter(grpc.WithClientDiscovery(registry))
+	transporter := grpc.NewTransporter()
 	// 创建容器
 	container := due.NewContainer()
 	// 创建节点组件

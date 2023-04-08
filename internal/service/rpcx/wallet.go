@@ -1,5 +1,0 @@
-package rpcx
-
-func NewWallet() {
-
-}

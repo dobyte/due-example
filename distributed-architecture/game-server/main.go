@@ -18,7 +18,7 @@ func main() {
 	// 创建服务发现
 	registry := consul.NewRegistry()
 	// 创建RPC传输器
-	transporter := grpc.NewTransporter(grpc.WithClientDiscovery(registry))
+	transporter := grpc.NewTransporter()
 	// 创建容器
 	container := due.NewContainer()
 	// 创建节点组件
