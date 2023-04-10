@@ -8,11 +8,11 @@ import (
 
 const target = "discovery://wallet"
 
-func NewClient(fn transport.NewServiceClientFunc) (*pb.WalletClient, error) {
+func NewClient(fn transport.NewServiceClientFunc) (*pb.WalletOneClient, error) {
 	c, err := fn(target)
 	if err != nil {
 		return nil, err
 	}
 
-	return pb.NewWalletClient(c.Conn().(client.XClient)), nil
+	return pb.NewWalletOneClient(c.Client().(*client.OneClient)), nil
 }

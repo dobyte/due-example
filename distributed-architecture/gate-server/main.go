@@ -14,7 +14,7 @@ import (
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/consul"
-	"github.com/dobyte/due/transport/grpc"
+	"github.com/dobyte/due/transport/rpcx"
 	"net/http"
 )
 
@@ -29,12 +29,18 @@ func main() {
 	server.OnUpgrade(func(w http.ResponseWriter, r *http.Request) bool {
 		return true
 	})
+	// 创建用户定位器
+	locator := redis.NewLocator()
+	// 创建服务发现
+	registry := consul.NewRegistry()
+	// 创建RPC传输器
+	transporter := rpcx.NewTransporter()
 	// 创建网关组件
 	gate := cluster.NewGate(
 		cluster.WithServer(server),
-		cluster.WithLocator(redis.NewLocator()),
-		cluster.WithRegistry(consul.NewRegistry()),
-		cluster.WithTransporter(grpc.NewTransporter()),
+		cluster.WithLocator(locator),
+		cluster.WithRegistry(registry),
+		cluster.WithTransporter(transporter),
 	)
 	// 添加网关组件
 	container.Add(gate)

@@ -14,5 +14,5 @@ func NewClient(fn transport.NewServiceClientFunc) (pb.WalletClient, error) {
 		return nil, err
 	}
 
-	return pb.NewWalletClient(client.Conn().(*grpc.ClientConn)), nil
+	return pb.NewWalletClient(client.Client().(*grpc.ClientConn)), nil
 }

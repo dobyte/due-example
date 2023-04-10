@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/dobyte/due"
-	_ "github.com/dobyte/due"
 	"github.com/dobyte/due-example/internal/pb"
 	"github.com/dobyte/due-example/internal/route"
 	"github.com/dobyte/due/cluster"

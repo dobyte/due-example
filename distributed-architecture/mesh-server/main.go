@@ -7,7 +7,7 @@ import (
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/registry/consul"
-	"github.com/dobyte/due/transport/grpc"
+	"github.com/dobyte/due/transport/rpcx"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	mesh := cluster.NewMesh(
 		cluster.WithLocator(redis.NewLocator()),
 		cluster.WithRegistry(consul.NewRegistry()),
-		cluster.WithTransporter(grpc.NewTransporter()),
+		cluster.WithTransporter(rpcx.NewTransporter()),
 	)
 	// 初始化业务
 	business.Init(mesh.Proxy())
