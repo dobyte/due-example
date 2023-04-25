@@ -1,7 +1,7 @@
 package business
 
 import (
-	"github.com/dobyte/due-example/internal/service/rpcx/wallet"
+	"github.com/dobyte/due-example/internal/service/grpc/wallet"
 	"github.com/dobyte/due/cluster/mesh"
 )
 

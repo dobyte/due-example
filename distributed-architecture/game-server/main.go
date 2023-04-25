@@ -7,7 +7,7 @@ import (
 	"github.com/dobyte/due/locate/redis"
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/registry/consul"
-	"github.com/dobyte/due/transport/rpcx"
+	"github.com/dobyte/due/transport/grpc"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	// 创建服务发现
 	registry := consul.NewRegistry()
 	// 创建RPC传输器
-	transporter := rpcx.NewTransporter()
+	transporter := grpc.NewTransporter()
 	// 创建容器
 	container := due.NewContainer()
 	// 创建节点组件

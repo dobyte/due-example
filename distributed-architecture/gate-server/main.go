@@ -14,7 +14,7 @@ import (
 	"github.com/dobyte/due/mode"
 	"github.com/dobyte/due/network/ws"
 	"github.com/dobyte/due/registry/consul"
-	"github.com/dobyte/due/transport/rpcx"
+	"github.com/dobyte/due/transport/grpc"
 	"net/http"
 )
 
@@ -34,7 +34,7 @@ func main() {
 	// 创建服务发现
 	registry := consul.NewRegistry()
 	// 创建RPC传输器
-	transporter := rpcx.NewTransporter()
+	transporter := grpc.NewTransporter()
 	// 创建网关组件
 	gate := cluster.NewGate(
 		cluster.WithServer(server),
